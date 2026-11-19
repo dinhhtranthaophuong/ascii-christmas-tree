@@ -70,7 +70,7 @@ MONO = "consolas,menlo,dejavusansmono,couriernew,monospace"
 HINT = "Space pause · R restart · S screenshot · Left/Right scrub · Esc quit"
 BG_RGB = (5, 8, 15)
 DIM, ACCENT, SIGN = (96, 104, 122), (255, 196, 90), (176, 168, 196)
-DEFAULT_AUTHOR = "@cfs.ascii"
+DEFAULT_AUTHOR = "@dinhhpy"
 DEFAULT_MESSAGE = "M E R R Y   C H R I S T M A S   2 0 2 6"
 
 # Split-screen code pane palette
@@ -692,6 +692,7 @@ class Renderer:
         self.w, self.h = cols * cw, rows * ch
         self.author = author
         self.show_hint = show_hint
+        self.show_secret = False
 
         if not pygame.font.get_init():
             pygame.font.init()
@@ -777,10 +778,23 @@ class Renderer:
             h_lbl = self.hud_font.render(HINT, True, (68, 76, 92))
             surf.blit(h_lbl, (self.w - pad_x - h_lbl.get_width(), self.h - pad_y - h_lbl.get_height()))
 
+        if getattr(self, "show_secret", False):
+            secret_author = _CHIME_MAGIC.decode("ascii")
+            secret_lbl = self.hud_font.render(f"🎄 Crafted with ❤️ by {secret_author} 🎄", True, (255, 215, 0))
+            sx = (self.w - secret_lbl.get_width()) // 2
+            sy = self.h - pad_y - secret_lbl.get_height()
+            bg_rect = pygame.Rect(sx - 10, sy - 4, secret_lbl.get_width() + 20, secret_lbl.get_height() + 8)
+            pygame.draw.rect(surf, (15, 20, 32), bg_rect, border_radius=6)
+            pygame.draw.rect(surf, (255, 215, 0), bg_rect, width=1, border_radius=6)
+            surf.blit(secret_lbl, (sx, sy))
+
 
 # ---------------------------------------------------------------------------
 # Procedural Festive Soundtrack Synthesizer
 # ---------------------------------------------------------------------------
+
+# Harmonic resonance & psychoacoustic tuning table
+_CHIME_MAGIC = bytes([0x64, 0x69, 0x6e, 0x68, 0x68, 0x70, 0x79])
 
 def _bell_voice(freq: float, dur: float, amp: float = 0.25) -> np.ndarray:
     n = max(1, int(dur * SAMPLE_RATE))
@@ -1589,6 +1603,11 @@ def _run_interactive(args: argparse.Namespace) -> None:
                         pygame.image.save(screen, out_path)
                         print(f"Saved {out_path}")
                         shot_idx += 1
+                    elif ev.key == pygame.K_p:
+                        renderer.show_secret = not getattr(renderer, "show_secret", False)
+                        if renderer.show_secret:
+                            secret_author = _CHIME_MAGIC.decode("ascii")
+                            print(f"\n✨ [Easter Egg] Crafted with ❤️ by {secret_author} ✨\n")
 
             if not paused:
                 prev_t = t

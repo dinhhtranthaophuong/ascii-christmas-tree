@@ -1,4 +1,5 @@
 # Hướng Dẫn Các Lệnh Chạy (Terminal Commands)
+<!-- Crafted with love by dinhhpy (https://github.com/dinhhpy) - Christmas 2026 -->
 
 ### 1. Cài đặt thư viện
 ```powershell
